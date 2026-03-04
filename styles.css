@@ -557,3 +557,7 @@ textarea:focus{
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+/* Respeta el atributo hidden */
+[hidden] { display: none !important; }
+.modalBack[hidden] { display: none !important; }
+.stampOverlay[hidden] { display: none !important; }
