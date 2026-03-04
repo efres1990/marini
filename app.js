@@ -369,14 +369,6 @@ function updateStreakOnAdd() {
 
 /* ================== APP ================== */
 let state = load();
-const alreadySeeded = localStorage.getItem(SEEDED_KEY) === "1";
-
-if(!alreadySeeded && (!state.logs || state.logs.length === 0)){
-  state.logs = defaultLogs.slice(0, MAX);
-  state.count = state.logs.length;
-  localStorage.setItem(SEEDED_KEY, "1");
-  save(state);
-}
 const defaultLogs = [
   { text: "Comer con Eladio y Ana muy bien", ts: new Date("2026-03-01T12:00:00").getTime() },
   { text: "Petarlo en el centro de día",      ts: new Date("2026-03-02T12:00:00").getTime() },
@@ -471,16 +463,13 @@ undoBtn.addEventListener("click", () => {
 });
 
 resetBtn.addEventListener("click", () => {
-  state.count = 0;
-  state.logs = [];
-  state.streak = 0;
-  state.lastDayISO = null;
-
-  localStorage.setItem(SEEDED_KEY, "1");
-
-  save(state);
-  render(state);
-  cloudSave(state).catch(()=>{});
+    state.count = 0;
+    state.logs = [];
+    state.streak = 0;
+    state.lastDayISO = null;
+    save(state);
+    cloudSave(state).catch(() => { });
+    render(state);
 });
 
 /* ---- Copy ---- */
