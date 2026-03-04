@@ -1,167 +1,194 @@
 <!doctype html>
 <html lang="es">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark light">
-  <title>Tarjeta de sellos</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light">
+    <title>Tarjeta de sellos</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-  <div class="bg" aria-hidden="true">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-    <div class="blob b3"></div>
-    <div class="grain"></div>
-  </div>
-
-  <main class="wrap">
-    <section class="app" aria-label="Tarjeta de sellos">
-      <header class="top">
-        <div class="brand">
-          <div class="markLogo" aria-hidden="true">
-            <span>✓</span>
-          </div>
-          <div>
-            <h1>Tarjeta de sellos</h1>
-            <p class="sub">Un sello por cada cosa que he hecho bien 💛</p>
-          </div>
-        </div>
-
-        <div class="toggles">
-          <button id="themeBtn" class="chip" type="button" aria-label="Cambiar tema">
-            <span class="chipIcon" aria-hidden="true">🌓</span>
-            <span class="chipText">Tema</span>
-          </button>
-          <button id="soundBtn" class="chip" type="button" aria-label="Activar o desactivar sonido">
-            <span class="chipIcon" aria-hidden="true">🔊</span>
-            <span class="chipText">Sonido</span>
-          </button>
-        </div>
-      </header>
-
-      <section class="progress">
-        <div class="progressRow">
-          <div class="pill">
-            <span class="muted">Progreso</span>
-            <strong><span id="count">0</span>/10</strong>
-          </div>
-          <div class="pill subtle">
-            <span class="muted">Racha</span>
-            <strong><span id="streak">0</span></strong>
-          </div>
-        </div>
-
-        <div class="bar" aria-label="Barra de progreso">
-          <div id="barFill" class="barFill"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panelHead">
-          <div>
-            <h2>Sellos</h2>
-            <p class="muted">Pulsa “Añadir” → escribe tu logro → OK → se sella ✨</p>
-          </div>
-          <div class="hintMini">
-            <span class="dot"></span>
-            <span>Sin números, sin presión.</span>
-          </div>
-        </div>
-
-        <div id="grid" class="grid" role="list" aria-label="Cuadrícula de sellos">
-          <button class="cell" type="button" role="listitem" data-i="1" aria-label="Sello 1"></button>
-          <button class="cell" type="button" role="listitem" data-i="2" aria-label="Sello 2"></button>
-          <button class="cell" type="button" role="listitem" data-i="3" aria-label="Sello 3"></button>
-          <button class="cell" type="button" role="listitem" data-i="4" aria-label="Sello 4"></button>
-          <button class="cell" type="button" role="listitem" data-i="5" aria-label="Sello 5"></button>
-          <button class="cell" type="button" role="listitem" data-i="6" aria-label="Sello 6"></button>
-          <button class="cell" type="button" role="listitem" data-i="7" aria-label="Sello 7"></button>
-          <button class="cell" type="button" role="listitem" data-i="8" aria-label="Sello 8"></button>
-          <button class="cell" type="button" role="listitem" data-i="9" aria-label="Sello 9"></button>
-          <button class="cell" type="button" role="listitem" data-i="10" aria-label="Sello 10"></button>
-        </div>
-
-        <!-- FX: sello que cae -->
-        <div id="stampOverlay" class="stampOverlay" aria-hidden="true" hidden>
-          <div id="stamp" class="stamp">
-            <div class="stampOuter">
-              <div class="stampInner">
-                <div class="stampCore">✓</div>
-                <div class="stampText tTop">COSAS QUE HE HECHO BIEN</div>
-                <div class="stampText tBot">BIEN HECHO</div>
-              </div>
-            </div>
-            <div class="stampShadow"></div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button id="openBtn" class="btn primary" type="button">
-            <span class="btnIcon" aria-hidden="true">✦</span>
-            Añadir logro
-          </button>
-          <button id="undoBtn" class="btn" type="button">Deshacer</button>
-          <button id="resetBtn" class="btn danger" type="button">Reiniciar</button>
-        </div>
-      </section>
-
-      <section class="panel log">
-        <div class="panelHead">
-          <div>
-            <h2>Lo que he conseguido</h2>
-            <p class="muted small">Se guarda solo en este dispositivo.</p>
-          </div>
-          <button id="copyBtn" class="btn tiny" type="button">Copiar</button>
-        </div>
-
-        <ul id="logList" class="logList"></ul>
-        <p id="emptyLog" class="muted">Aún no hay logros guardados.</p>
-      </section>
-
-      <section id="doneCard" class="done" hidden>
-        <div class="doneTop">
-          <div class="badge">10/10</div>
-          <div class="badge soft">✨</div>
-        </div>
-        <h2>¡Completado! 🎉</h2>
-        <p>Has reunido 10 pasos de cuidado. Celebra a tu ritmo, con algo que te haga bien.</p>
-        <p class="muted small">Los sellos celebran cuidado, no perfección.</p>
-      </section>
-
-      <footer class="foot">
-        <small class="muted">
-          Si esto te presiona, se puede pausar. Lo importante es cuidarte.
-        </small>
-      </footer>
-    </section>
-  </main>
-
-  <!-- Modal -->
-  <div id="modalBack" class="modalBack" hidden>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-      <div class="modalTop">
-        <h3 id="mTitle">¿Qué has conseguido hoy?</h3>
-        <button id="closeBtn" class="xBtn" type="button" aria-label="Cerrar">✕</button>
-      </div>
-
-      <p class="muted small">Una frase cortita vale. Lo pequeño también cuenta.</p>
-
-      <textarea id="input" rows="4" placeholder="Ej: Hoy pedí ayuda / me cuidé / hice algo que me calmó…"></textarea>
-
-      <div class="modalActions">
-        <button id="cancelBtn" class="btn" type="button">Cancelar</button>
-        <button id="okBtn" class="btn primary" type="button">OK y sellar</button>
-      </div>
-
-      <p id="warn" class="warn" hidden>Escribe algo para poder sellar 🙂</p>
+    <div class="bg" aria-hidden="true">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+        <div class="grain"></div>
     </div>
-  </div>
 
-  <!-- Confetti -->
-  <div id="confetti" class="confetti" aria-hidden="true"></div>
+    <main class="wrap">
+        <section class="app" aria-label="Tarjeta de sellos">
+            <header class="top">
+                <div class="brand">
+                    <div class="markLogo" aria-hidden="true">
+                        <span>✓</span>
+                    </div>
+                    <div>
+                        <h1>Tarjeta de sellos</h1>
+                        <p class="sub">Un sello por cada cosa que he hecho bien 💛</p>
+                    </div>
+                </div>
 
-  <script src="app.js"></script>
+                <div class="toggles">
+                    <button id="themeBtn" class="chip" type="button" aria-label="Cambiar tema">
+                        <span class="chipIcon" aria-hidden="true">🌓</span>
+                        <span class="chipText">Tema</span>
+                    </button>
+                    <button id="soundBtn" class="chip" type="button" aria-label="Activar o desactivar sonido">
+                        <span class="chipIcon" aria-hidden="true">🔊</span>
+                        <span class="chipText">Sonido</span>
+                    </button>
+                </div>
+            </header>
+
+            <section class="progress">
+                <div class="progressRow">
+                    <div class="pill">
+                        <span class="muted">Progreso</span>
+                        <strong><span id="count">0</span>/10</strong>
+                    </div>
+                    <div class="pill subtle">
+                        <span class="muted">Racha</span>
+                        <strong><span id="streak">0</span></strong>
+                    </div>
+                </div>
+
+                <div class="bar" aria-label="Barra de progreso">
+                    <div id="barFill" class="barFill"></div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panelHead">
+                    <div>
+                        <h2>Sellos</h2>
+                        <p class="muted">Pulsa “Añadir” → escribe tu logro → OK → se sella ✨</p>
+                    </div>
+                    <div class="hintMini">
+                        <span class="dot"></span>
+                        <span>Sin números, sin presión.</span>
+                    </div>
+                </div>
+
+                <div id="grid" class="grid" role="list" aria-label="Cuadrícula de sellos">
+                    <button class="cell" type="button" role="listitem" data-i="1" aria-label="Sello 1"></button>
+                    <button class="cell" type="button" role="listitem" data-i="2" aria-label="Sello 2"></button>
+                    <button class="cell" type="button" role="listitem" data-i="3" aria-label="Sello 3"></button>
+                    <button class="cell" type="button" role="listitem" data-i="4" aria-label="Sello 4"></button>
+                    <button class="cell" type="button" role="listitem" data-i="5" aria-label="Sello 5"></button>
+                    <button class="cell" type="button" role="listitem" data-i="6" aria-label="Sello 6"></button>
+                    <button class="cell" type="button" role="listitem" data-i="7" aria-label="Sello 7"></button>
+                    <button class="cell" type="button" role="listitem" data-i="8" aria-label="Sello 8"></button>
+                    <button class="cell" type="button" role="listitem" data-i="9" aria-label="Sello 9"></button>
+                    <button class="cell" type="button" role="listitem" data-i="10" aria-label="Sello 10"></button>
+                </div>
+
+                <!-- FX: sello que cae -->
+                <div id="stampOverlay" class="stampOverlay" aria-hidden="true" hidden>
+                    <div id="stamp" class="stamp">
+                        <div class="stampOuter">
+                            <div class="stampInner">
+                                <div class="stampCore">✓</div>
+                                <div class="stampText tTop">COSAS QUE HE HECHO BIEN</div>
+                                <div class="stampText tBot">BIEN HECHO</div>
+                            </div>
+                        </div>
+                        <div class="stampShadow"></div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="openBtn" class="btn primary" type="button">
+                        <span class="btnIcon" aria-hidden="true">✦</span>
+                        Añadir logro
+                    </button>
+                    <button id="undoBtn" class="btn" type="button">Deshacer</button>
+                    <button id="resetBtn" class="btn danger" type="button">Reiniciar</button>
+                </div>
+            </section>
+
+            <section class="panel log">
+                <div class="panelHead">
+                    <div>
+                        <h2>Lo que he conseguido</h2>
+                        <p class="muted small">Se guarda solo en este dispositivo.</p>
+                    </div>
+                    <button id="copyBtn" class="btn tiny" type="button">Copiar</button>
+                </div>
+
+                <ul id="logList" class="logList"></ul>
+                <p id="emptyLog" class="muted">Aún no hay logros guardados.</p>
+            </section>
+
+            <section id="doneCard" class="done" hidden>
+                <div class="doneTop">
+                    <div class="badge">10/10</div>
+                    <div class="badge soft">✨</div>
+                </div>
+                <h2>¡Completado! 🎉</h2>
+                <p>Has reunido 10 pasos de cuidado. Celebra a tu ritmo, con algo que te haga bien.</p>
+                <p class="muted small">Los sellos celebran cuidado, no perfección.</p>
+            </section>
+
+            <footer class="foot">
+                <small class="muted">
+                    Si esto te presiona, se puede pausar. Lo importante es cuidarte.
+                </small>
+            </footer>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="modalBack" class="modalBack" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+            <div class="modalTop">
+                <h3 id="mTitle">¿Qué has conseguido hoy?</h3>
+                <button id="closeBtn" class="xBtn" type="button" aria-label="Cerrar">✕</button>
+            </div>
+
+            <p class="muted small">Una frase cortita vale. Lo pequeño también cuenta.</p>
+
+            <textarea id="input" rows="4"
+                placeholder="Ej: Hoy pedí ayuda / me cuidé / hice algo que me calmó…"></textarea>
+
+            <div class="modalActions">
+                <button id="cancelBtn" class="btn" type="button">Cancelar</button>
+                <button id="okBtn" class="btn primary" type="button">OK y sellar</button>
+            </div>
+
+            <p id="warn" class="warn" hidden>Escribe algo para poder sellar 🙂</p>
+        </div>
+    </div>
+
+    <!-- Confetti -->
+    <div id="confetti" class="confetti" aria-hidden="true"></div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+        // 1) Pega aquí tu config (de Firebase Console)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBL6J8vd-5P0MEtOo1nw0Tz2j5VzoG9AZI",
+            authDomain: "marini-b97bb.firebaseapp.com",
+            projectId: "marini-b97bb",
+            storageBucket: "marini-b97bb.firebasestorage.app",
+            messagingSenderId: "689777005769",
+            appId: "1:689777005769:web:3a61c83ff623b432d7e918",
+            measurementId: "G-C1ZH290ZWV"
+        };
+
+        // 2) Inicializa
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 3) Expón helpers globales para tu app.js (simple)
+        window.__fb = { auth, db, signInAnonymously, onAuthStateChanged, doc, getDoc, setDoc };
+    </script>
+
+    <script src="app.js"></script>
 </body>
+
 </html>
