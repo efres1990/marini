@@ -167,22 +167,41 @@ function setThemeUI(theme) {
     text.textContent = (theme === "light") ? "Claro" : "Oscuro";
 }
 
-function stampMarkSVG(dateText) {
+function escapeHTML(str) {
+    return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function stampMarkHTML(dateText, phraseText) {
+    const safeDate = escapeHTML(dateText);
+    const safePhrase = escapeHTML(phraseText);
 
     return `
-  <div class="markInCell">
-    <svg viewBox="0 0 200 200" fill="none">
-      <circle cx="100" cy="100" r="74" stroke="#60a5fa" stroke-width="10"/>
-      <path d="M70 104 L92 126 L134 78"
-        stroke="#60a5fa"
-        stroke-width="14"
-        stroke-linecap="round"
-        stroke-linejoin="round"/>
-    </svg>
+    <div class="markInCell" aria-hidden="true">
+      <svg viewBox="0 0 200 200" fill="none">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="rgba(80,240,189,0.95)"/>
+            <stop offset="0.55" stop-color="rgba(122,168,255,0.95)"/>
+            <stop offset="1" stop-color="rgba(255,210,122,0.95)"/>
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r="74" stroke="url(#g)" stroke-width="10" opacity="0.98"/>
+        <circle cx="100" cy="100" r="56" stroke="url(#g)" stroke-width="3" stroke-dasharray="6 8" opacity="0.88"/>
+        <path d="M70 104 L92 126 L134 78" stroke="url(#g)" stroke-width="14"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
 
-    <div class="stampDate">${dateText}</div>
-  </div>
-  `
+      <div class="stampInfo">
+        <div class="stampDate">${safeDate}</div>
+        <div class="stampPhrase">${safePhrase}</div>
+      </div>
+    </div>
+  `;
 }
 
 function render(state) {
@@ -191,29 +210,29 @@ function render(state) {
     barFill.style.width = `${(state.count / MAX) * 100}%`;
 
     cells.forEach((c, idx) => {
-
-        const log = state.logs[idx]
+        const log = state.logs[idx];
 
         if (log) {
+            c.classList.add("filled");
 
-            c.classList.add("filled")
-
-            const date = new Date(log.ts)
-            const dateText = date.toLocaleDateString("es-ES", {
+            const d = new Date(log.ts);
+            let dateText = d.toLocaleDateString("es-ES", {
+                weekday: "short",
                 day: "numeric",
                 month: "short"
-            })
+            });
 
-            c.innerHTML = stampMarkSVG(dateText)
+            // limpia el punto típico (ej: "mié.")
+            dateText = dateText.replace(".", "");
+            // Mayúscula inicial
+            dateText = dateText.charAt(0).toUpperCase() + dateText.slice(1);
 
+            c.innerHTML = stampMarkHTML(dateText, log.text);
         } else {
-
-            c.classList.remove("filled")
-            c.innerHTML = ""
-
+            c.classList.remove("filled");
+            c.innerHTML = "";
         }
-
-    })
+    });
 
     undoBtn.disabled = state.count <= 0;
     openBtn.disabled = state.count >= MAX;
@@ -352,27 +371,27 @@ function updateStreakOnAdd() {
 let state = load();
 const defaultLogs = [
 
-{
-text: "Comer con Eladio y Ana muy bien",
-ts: new Date("2026-03-01").getTime()
-},
+    {
+        text: "Comer con Eladio y Ana muy bien",
+        ts: new Date("2026-03-01").getTime()
+    },
 
-{
-text: "Petarlo en el centro de día",
-ts: new Date("2026-03-02").getTime()
-},
+    {
+        text: "Petarlo en el centro de día",
+        ts: new Date("2026-03-02").getTime()
+    },
 
-{
-text: "10 sentadillas",
-ts: new Date("2026-03-03").getTime()
-}
+    {
+        text: "10 sentadillas",
+        ts: new Date("2026-03-03").getTime()
+    }
 
 ]
-if(state.logs.length === 0){
+if (state.logs.length === 0) {
 
-  state.logs = defaultLogs
-  state.count = defaultLogs.length
-  save(state)
+    state.logs = defaultLogs
+    state.count = defaultLogs.length
+    save(state)
 
 }
 (async () => {
