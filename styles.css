@@ -775,13 +775,6 @@ textarea:focus {
 
   text-align: center;
   pointer-events: none;
-
-  /* un pelín de “tarjetita” para que se lea mejor */
-  padding: 6px 6px 4px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, .10);
-  border: 1px solid rgba(255, 255, 255, .10);
-  backdrop-filter: blur(6px);
 }
 
 :root[data-theme="light"] .stampInfo {
