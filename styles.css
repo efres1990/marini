@@ -659,7 +659,7 @@ textarea:focus{
   font-weight:800;
   line-height:1.15;
   opacity:.86;
-
+display: none;
   /* SOLO 1 línea */
   white-space: nowrap;
   overflow: hidden;
