@@ -369,7 +369,7 @@ let state = load();
 const defaultLogs = [
   { text: "Comer con Eladio y Ana muy bien", ts: new Date("2026-03-01T12:00:00").getTime() },
   { text: "Petarlo en el centro de día",      ts: new Date("2026-03-02T12:00:00").getTime() },
-  { text: "Ayer por las 10 sentadillas",      ts: new Date("2026-03-03T12:00:00").getTime() },
+  { text: "Por las 10 sentadillas",      ts: new Date("2026-03-03T12:00:00").getTime() },
 ];
 
 const alreadySeeded = localStorage.getItem(SEEDED_KEY) === "1";
