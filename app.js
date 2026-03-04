@@ -177,31 +177,28 @@ function escapeHTML(str) {
 }
 
 function stampMarkHTML(dateText, phraseText){
-  const safeDate = escapeHTML(dateText);
-  const safePhrase = escapeHTML(phraseText);
+
+  const safeDate = escapeHTML(dateText)
+  const safePhrase = escapeHTML(phraseText)
 
   return `
-    <div class="markInCell" aria-hidden="true">
+    <div class="markInCell">
+
+      <div class="stampPhraseTop">${safePhrase}</div>
+
       <svg viewBox="0 0 200 200" fill="none">
-        <defs>
-          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="rgba(80,240,189,0.95)"/>
-            <stop offset="0.55" stop-color="rgba(122,168,255,0.95)"/>
-            <stop offset="1" stop-color="rgba(255,210,122,0.95)"/>
-          </linearGradient>
-        </defs>
-        <circle cx="100" cy="100" r="74" stroke="url(#g)" stroke-width="10" opacity="0.98"/>
-        <circle cx="100" cy="100" r="56" stroke="url(#g)" stroke-width="3" stroke-dasharray="6 8" opacity="0.88"/>
-        <path d="M70 104 L92 126 L134 78" stroke="url(#g)" stroke-width="14"
-          stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="100" cy="100" r="74" stroke="#60a5fa" stroke-width="10"/>
+        <path d="M70 104 L92 126 L134 78"
+          stroke="#60a5fa"
+          stroke-width="14"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
       </svg>
 
-      <div class="stampMeta">
-        <div class="stampDate">${safeDate}</div>
-        <div class="stampPhrase">${safePhrase}</div>
-      </div>
+      <div class="stampDate">${safeDate}</div>
+
     </div>
-  `;
+  `
 }
 
 function render(state) {
