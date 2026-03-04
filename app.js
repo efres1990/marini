@@ -384,6 +384,7 @@ if (!alreadySeeded && (!state.logs || state.logs.length === 0)) {
   localStorage.setItem(SEEDED_KEY, "1");
   save(state);
 }
+
 (async () => {
     // 1) pinta algo rápido con local (para no esperar)
     render(state);
