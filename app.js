@@ -1,5 +1,5 @@
 const MAX = 10;
-
+const SEEDED_KEY = "sellos_seeded_v1";
 const KEY = "sellos_v4_state";   // {count, logs:[{text, ts}], theme, sound, streak, lastDayISO}
 const $ = (id) => document.getElementById(id);
 
@@ -369,24 +369,19 @@ function updateStreakOnAdd() {
 
 /* ================== APP ================== */
 let state = load();
+const alreadySeeded = localStorage.getItem(SEEDED_KEY) === "1";
+
+if(!alreadySeeded && (!state.logs || state.logs.length === 0)){
+  state.logs = defaultLogs.slice(0, MAX);
+  state.count = state.logs.length;
+  localStorage.setItem(SEEDED_KEY, "1");
+  save(state);
+}
 const defaultLogs = [
-
-    {
-        text: "Comer con Eladio y Ana muy bien",
-        ts: new Date("2026-03-01").getTime()
-    },
-
-    {
-        text: "Petarlo en el centro de día",
-        ts: new Date("2026-03-02").getTime()
-    },
-
-    {
-        text: "10 sentadillas",
-        ts: new Date("2026-03-03").getTime()
-    }
-
-]
+  { text: "Comer con Eladio y Ana muy bien", ts: new Date("2026-03-01T12:00:00").getTime() },
+  { text: "Petarlo en el centro de día",      ts: new Date("2026-03-02T12:00:00").getTime() },
+  { text: "Ayer por las 10 sentadillas",      ts: new Date("2026-03-03T12:00:00").getTime() },
+];
 if (state.logs.length === 0) {
 
     state.logs = defaultLogs
@@ -476,13 +471,16 @@ undoBtn.addEventListener("click", () => {
 });
 
 resetBtn.addEventListener("click", () => {
-    state.count = 0;
-    state.logs = [];
-    state.streak = 0;
-    state.lastDayISO = null;
-    save(state);
-    cloudSave(state).catch(() => { });
-    render(state);
+  state.count = 0;
+  state.logs = [];
+  state.streak = 0;
+  state.lastDayISO = null;
+
+  localStorage.setItem(SEEDED_KEY, "1");
+
+  save(state);
+  render(state);
+  cloudSave(state).catch(()=>{});
 });
 
 /* ---- Copy ---- */
