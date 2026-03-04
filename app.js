@@ -369,25 +369,20 @@ function updateStreakOnAdd() {
 
 /* ================== APP ================== */
 let state = load();
-const alreadySeeded = localStorage.getItem(SEEDED_KEY) === "1";
-
-if(!alreadySeeded && (!state.logs || state.logs.length === 0)){
-  state.logs = defaultLogs.slice(0, MAX);
-  state.count = state.logs.length;
-  localStorage.setItem(SEEDED_KEY, "1");
-  save(state);
-}
 const defaultLogs = [
   { text: "Comer con Eladio y Ana muy bien", ts: new Date("2026-03-01T12:00:00").getTime() },
   { text: "Petarlo en el centro de día",      ts: new Date("2026-03-02T12:00:00").getTime() },
   { text: "Ayer por las 10 sentadillas",      ts: new Date("2026-03-03T12:00:00").getTime() },
 ];
-if (state.logs.length === 0) {
 
-    state.logs = defaultLogs
-    state.count = defaultLogs.length
-    save(state)
+const alreadySeeded = localStorage.getItem(SEEDED_KEY) === "1";
 
+// Solo sembramos si NO se ha sembrado nunca y no hay logs guardados
+if (!alreadySeeded && (!state.logs || state.logs.length === 0)) {
+  state.logs = defaultLogs.slice(0, MAX);
+  state.count = state.logs.length;
+  localStorage.setItem(SEEDED_KEY, "1");
+  save(state);
 }
 (async () => {
     // 1) pinta algo rápido con local (para no esperar)
