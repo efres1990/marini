@@ -1,67 +1,113 @@
 const MAX = 10;
-const KEY = "stamp_app_v3"; // {count, logs:[{text, ts}]}
 
-const countEl = document.getElementById("count");
-const barFill = document.getElementById("barFill");
+const KEY = "sellos_v4_state";   // {count, logs:[{text, ts}], theme, sound, streak, lastDayISO}
+const $ = (id) => document.getElementById(id);
+
+const countEl = $("count");
+const streakEl = $("streak");
+const barFill = $("barFill");
+
+const grid = $("grid");
 const cells = Array.from(document.querySelectorAll(".cell"));
 
-const openModalBtn = document.getElementById("openModalBtn");
-const undoBtn = document.getElementById("undoBtn");
-const resetBtn = document.getElementById("resetBtn");
-const exportBtn = document.getElementById("exportBtn");
+const openBtn = $("openBtn");
+const undoBtn = $("undoBtn");
+const resetBtn = $("resetBtn");
+const copyBtn = $("copyBtn");
 
-const finalCard = document.getElementById("finalCard");
+const doneCard = $("doneCard");
 
-const backdrop = document.getElementById("backdrop");
-const achievementInput = document.getElementById("achievementInput");
-const okBtn = document.getElementById("okBtn");
-const cancelBtn = document.getElementById("cancelBtn");
-const closeX = document.getElementById("closeX");
-const hint = document.getElementById("hint");
+const modalBack = $("modalBack");
+const closeBtn = $("closeBtn");
+const cancelBtn = $("cancelBtn");
+const okBtn = $("okBtn");
+const input = $("input");
+const warn = $("warn");
 
-const logList = document.getElementById("logList");
-const emptyLog = document.getElementById("emptyLog");
+const themeBtn = $("themeBtn");
+const soundBtn = $("soundBtn");
 
-const stampFX = document.getElementById("stampFX");
-const stamp = stampFX.querySelector(".stamp");
+const stampOverlay = $("stampOverlay");
+const stamp = $("stamp");
 
-const confetti = document.getElementById("confetti");
+const confetti = $("confetti");
+
+const logList = $("logList");
+const emptyLog = $("emptyLog");
 
 function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+function todayISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function fmt(ts){
+  const d = new Date(ts);
+  return d.toLocaleString("es-ES", { dateStyle:"medium", timeStyle:"short" });
+}
 
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
-    if(!raw) return {count:0, logs:[]};
-    const obj = JSON.parse(raw);
-    const count = clamp(Number(obj.count)||0, 0, MAX);
-    const logs = Array.isArray(obj.logs) ? obj.logs.filter(x => x && typeof x.text==="string").slice(0, MAX) : [];
-    return {count, logs};
+    if(!raw) return {
+      count: 0, logs: [],
+      theme: "dark",
+      sound: true,
+      streak: 0,
+      lastDayISO: null
+    };
+    const s = JSON.parse(raw);
+    return {
+      count: clamp(Number(s.count)||0, 0, MAX),
+      logs: Array.isArray(s.logs) ? s.logs.filter(x => x && typeof x.text==="string").slice(0, MAX) : [],
+      theme: (s.theme === "light") ? "light" : "dark",
+      sound: (s.sound !== false),
+      streak: clamp(Number(s.streak)||0, 0, 9999),
+      lastDayISO: (typeof s.lastDayISO === "string") ? s.lastDayISO : null
+    };
   }catch{
-    return {count:0, logs:[]};
+    return { count:0, logs:[], theme:"dark", sound:true, streak:0, lastDayISO:null };
   }
 }
-function save(state){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
-function fmt(ts){
-  const d = new Date(ts);
-  return d.toLocaleString("es-ES", {dateStyle:"medium", timeStyle:"short"});
+function save(state){
+  localStorage.setItem(KEY, JSON.stringify(state));
 }
 
-function stampSVG(){
-  // “Sello” marcado dentro de la casilla
+function setTheme(theme){
+  document.documentElement.dataset.theme = theme;
+}
+
+function setSoundUI(on){
+  const icon = soundBtn.querySelector(".chipIcon");
+  const text = soundBtn.querySelector(".chipText");
+  icon.textContent = on ? "🔊" : "🔇";
+  text.textContent = on ? "Sonido" : "Silencio";
+}
+
+function setThemeUI(theme){
+  const text = themeBtn.querySelector(".chipText");
+  text.textContent = (theme === "light") ? "Claro" : "Oscuro";
+}
+
+function stampMarkSVG(){
+  // Marca “tinta” dentro de la casilla
   return `
-    <div class="mark" aria-hidden="true">
+    <div class="markInCell" aria-hidden="true">
       <svg viewBox="0 0 200 200" fill="none">
         <defs>
           <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="rgba(77,230,179,0.95)"/>
-            <stop offset="0.55" stop-color="rgba(118,169,255,0.95)"/>
-            <stop offset="1" stop-color="rgba(255,218,123,0.95)"/>
+            <stop offset="0" stop-color="rgba(80,240,189,0.95)"/>
+            <stop offset="0.55" stop-color="rgba(122,168,255,0.95)"/>
+            <stop offset="1" stop-color="rgba(255,210,122,0.95)"/>
           </linearGradient>
         </defs>
-        <circle cx="100" cy="100" r="74" stroke="url(#g)" stroke-width="10" opacity="0.95"/>
-        <circle cx="100" cy="100" r="56" stroke="url(#g)" stroke-width="3" stroke-dasharray="6 8" opacity="0.85"/>
+        <circle cx="100" cy="100" r="74" stroke="url(#g)" stroke-width="10" opacity="0.98"/>
+        <circle cx="100" cy="100" r="56" stroke="url(#g)" stroke-width="3" stroke-dasharray="6 8" opacity="0.88"/>
         <path d="M70 104 L92 126 L134 78" stroke="url(#g)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
@@ -70,24 +116,26 @@ function stampSVG(){
 
 function render(state){
   countEl.textContent = String(state.count);
+  streakEl.textContent = String(state.streak);
   barFill.style.width = `${(state.count / MAX) * 100}%`;
 
   cells.forEach((c, idx) => {
     const i = idx + 1;
     const filled = i <= state.count;
     c.classList.toggle("filled", filled);
-    // poner/quitar marca
-    const existing = c.querySelector(".mark");
-    if(filled && !existing) c.insertAdjacentHTML("beforeend", stampSVG());
+
+    const existing = c.querySelector(".markInCell");
+    if(filled && !existing) c.insertAdjacentHTML("beforeend", stampMarkSVG());
     if(!filled && existing) existing.remove();
+
+    c.setAttribute("aria-label", filled ? `Sello ${i} completado` : `Sello ${i} vacío`);
   });
 
   undoBtn.disabled = state.count <= 0;
-  openModalBtn.disabled = state.count >= MAX;
+  openBtn.disabled = state.count >= MAX;
+  doneCard.hidden = state.count < MAX;
 
-  finalCard.hidden = state.count < MAX;
-
-  // log
+  // Log
   logList.innerHTML = "";
   if(state.logs.length === 0){
     emptyLog.hidden = false;
@@ -96,153 +144,243 @@ function render(state){
     state.logs.slice().reverse().forEach(item => {
       const li = document.createElement("li");
       li.textContent = item.text.trim();
+
       const meta = document.createElement("span");
       meta.className = "meta";
       meta.textContent = fmt(item.ts);
+
       li.appendChild(meta);
       logList.appendChild(li);
     });
   }
+
+  setTheme(state.theme);
+  setThemeUI(state.theme);
+  setSoundUI(state.sound);
 }
 
 function openModal(){
-  hint.hidden = true;
-  achievementInput.value = "";
-  backdrop.hidden = false;
-  achievementInput.focus();
+  warn.hidden = true;
+  input.value = "";
+  modalBack.hidden = false;
+  input.focus();
 }
+
 function closeModal(){
-  backdrop.hidden = true;
+  modalBack.hidden = true;
 }
 
 function playStampFX(targetCell){
-  // Coloca el sello encima de la casilla objetivo y lo anima cayendo
-  const gridRect = document.getElementById("grid").getBoundingClientRect();
+  // posiciona sello sobre la casilla y reproduce animación
+  const wrapRect = grid.getBoundingClientRect();
   const cellRect = targetCell.getBoundingClientRect();
 
-  // Posición relativa dentro de gridWrap (stampFX está absolute dentro)
-  // Convertimos al sistema de coordenadas del gridWrap:
-  const wrap = stampFX.parentElement.getBoundingClientRect();
-  const cx = (cellRect.left - wrap.left) + (cellRect.width / 2);
-  const cy = (cellRect.top  - wrap.top ) + (cellRect.height / 2);
+  const cx = (cellRect.left - wrapRect.left) + cellRect.width/2;
+  const cy = (cellRect.top - wrapRect.top) + cellRect.height/2;
 
-  stampFX.hidden = false;
+  stampOverlay.hidden = false;
 
-  // Centramos el sello sobre la casilla
-  stampFX.style.placeItems = "unset";
-  stampFX.style.display = "block";
-  stampFX.style.position = "absolute";
-  stampFX.style.inset = "0";
+  // Overlay está dentro del panel, y grid es el contenedor de referencia
+  stampOverlay.style.inset = "0";
+  stampOverlay.style.left = `${grid.offsetLeft}px`;
+  stampOverlay.style.top = `${grid.offsetTop}px`;
+  stampOverlay.style.width = `${grid.offsetWidth}px`;
+  stampOverlay.style.height = `${grid.offsetHeight}px`;
 
-  stamp.style.position = "absolute";
   stamp.style.left = `${cx}px`;
   stamp.style.top  = `${cy}px`;
-  stamp.style.transform = "translate(-50%, -50%)"; // base (la animación aplica encima)
 
-  // Reiniciar animación
   stamp.classList.remove("play");
-  void stamp.offsetWidth; // reflow
+  void stamp.offsetWidth;
   stamp.classList.add("play");
 
-  // Ocultar al terminar
-  setTimeout(() => {
-    stampFX.hidden = true;
-  }, 560);
+  setTimeout(() => { stampOverlay.hidden = true; }, 580);
 }
 
 function spawnConfetti(){
   confetti.innerHTML = "";
-  const pieces = 110;
+  const pieces = 120;
   for(let i=0;i<pieces;i++){
     const el = document.createElement("i");
     const left = Math.random()*100;
     const delay = Math.random()*0.25;
-    const duration = 0.95 + Math.random()*0.75;
-    const size = 8 + Math.random()*8;
+    const duration = 0.95 + Math.random()*0.9;
+    const size = 8 + Math.random()*9;
 
     el.style.left = `${left}vw`;
     el.style.animationDelay = `${delay}s`;
     el.style.animationDuration = `${duration}s`;
     el.style.width = `${size}px`;
     el.style.height = `${size*1.25}px`;
-    el.style.transform = `translateY(-12px) rotate(${Math.random()*180}deg)`;
+    el.style.transform = `translateY(-14px) rotate(${Math.random()*180}deg)`;
     confetti.appendChild(el);
   }
-  setTimeout(() => confetti.innerHTML = "", 2000);
+  setTimeout(() => confetti.innerHTML = "", 2200);
 }
 
+/* ----- Sonido suave opcional (WebAudio) ----- */
+let audioCtx = null;
+function softClick(){
+  if(!state.sound) return;
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const t = audioCtx.currentTime;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(620, t);
+    osc.frequency.exponentialRampToValueAtTime(330, t + 0.07);
+
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.12, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.13);
+  }catch{
+    // si falla, no pasa nada
+  }
+}
+
+/* ----- Racha (1 por día si añade al menos 1 sello ese día) ----- */
+function updateStreakOnAdd(){
+  const today = todayISO();
+  if(state.lastDayISO === today) return; // ya contó hoy
+
+  // si ayer fue el último día, incrementa, si no reinicia a 1
+  if(state.lastDayISO){
+    const last = new Date(state.lastDayISO + "T00:00:00");
+    const now = new Date(today + "T00:00:00");
+    const diffDays = Math.round((now - last) / 86400000);
+    state.streak = (diffDays === 1) ? (state.streak + 1) : 1;
+  }else{
+    state.streak = 1;
+  }
+  state.lastDayISO = today;
+}
+
+/* ================== APP ================== */
 let state = load();
 render(state);
 
-// --- Eventos ---
-openModalBtn.addEventListener("click", openModal);
-
+/* ---- Modal events ---- */
+openBtn.addEventListener("click", openModal);
+closeBtn.addEventListener("click", closeModal);
 cancelBtn.addEventListener("click", closeModal);
-closeX.addEventListener("click", closeModal);
 
-backdrop.addEventListener("click", (e) => {
-  if(e.target === backdrop) closeModal();
+modalBack.addEventListener("click", (e) => {
+  if(e.target === modalBack) closeModal();
 });
 
-achievementInput.addEventListener("keydown", (e) => {
+input.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") closeModal();
   if(e.key === "Enter" && !e.shiftKey){
     e.preventDefault();
     okBtn.click();
   }
 });
 
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape" && !modalBack.hidden) closeModal();
+});
+
+/* ---- OK -> sellar ---- */
 okBtn.addEventListener("click", () => {
-  const text = achievementInput.value.trim();
+  const text = input.value.trim();
   if(!text){
-    hint.hidden = false;
-    achievementInput.focus();
+    warn.hidden = false;
+    input.focus();
     return;
   }
   if(state.count >= MAX) return;
 
   const next = state.count + 1;
-  const logs = state.logs.concat([{text, ts: Date.now()}]).slice(0, MAX);
+  const targetCell = cells[next - 1];
 
-  state = {count: next, logs};
+  // Actualiza estado
+  state.count = next;
+  state.logs = state.logs.concat([{ text, ts: Date.now() }]).slice(0, MAX);
+  updateStreakOnAdd();
   save(state);
+
   closeModal();
 
-  // Animación de sello sobre la casilla que se va a completar
-  const targetCell = cells[next - 1];
+  // FX sello + sonido
   playStampFX(targetCell);
+  softClick();
 
-  // Pintamos la marca justo después del “golpe” del sello
+  // Pinta la marca justo después del “golpe”
   setTimeout(() => render(state), 220);
 
   if(next === MAX){
-    setTimeout(spawnConfetti, 520);
+    setTimeout(() => {
+      spawnConfetti();
+      softClick();
+    }, 520);
   }
 });
 
+/* ---- Undo / Reset ---- */
 undoBtn.addEventListener("click", () => {
   if(state.count <= 0) return;
-  state = {
-    count: state.count - 1,
-    logs: state.logs.slice(0, Math.max(0, state.logs.length - 1))
-  };
+  state.count -= 1;
+  state.logs = state.logs.slice(0, Math.max(0, state.logs.length - 1));
   save(state);
   render(state);
 });
 
 resetBtn.addEventListener("click", () => {
-  state = {count:0, logs:[]};
+  state.count = 0;
+  state.logs = [];
+  state.streak = 0;
+  state.lastDayISO = null;
   save(state);
   render(state);
 });
 
-exportBtn.addEventListener("click", async () => {
+/* ---- Copy ---- */
+copyBtn.addEventListener("click", async () => {
   const lines = state.logs.map((l, i) => `${i+1}. ${l.text.trim()} (${fmt(l.ts)})`);
   const payload = lines.length ? lines.join("\n") : "Aún no hay logros guardados.";
   try{
     await navigator.clipboard.writeText(payload);
-    exportBtn.textContent = "¡Copiado!";
-    setTimeout(() => exportBtn.textContent = "Copiar", 900);
+    const old = copyBtn.textContent;
+    copyBtn.textContent = "¡Copiado!";
+    setTimeout(() => copyBtn.textContent = old, 900);
   }catch{
     window.prompt("Copia el texto:", payload);
   }
+});
+
+/* ---- Theme / Sound ---- */
+themeBtn.addEventListener("click", () => {
+  state.theme = (state.theme === "light") ? "dark" : "light";
+  save(state);
+  render(state);
+});
+
+soundBtn.addEventListener("click", () => {
+  state.sound = !state.sound;
+  save(state);
+  render(state);
+});
+
+/* ---- Bonus: click en casillas para “ver” (sin editar) ---- */
+cells.forEach((c, idx) => {
+  c.addEventListener("click", () => {
+    const i = idx + 1;
+    if(i <= state.count){
+      // micro “bounce” amable al tocar un sello completado
+      c.animate(
+        [{ transform:"scale(1)" }, { transform:"scale(1.03)" }, { transform:"scale(1)" }],
+        { duration: 220, easing: "ease-out" }
+      );
+      softClick();
+    }
+  });
 });
