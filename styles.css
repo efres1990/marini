@@ -586,27 +586,44 @@ textarea:focus{
   left:8px;
   right:8px;
   bottom:8px;
+
   display:flex;
   flex-direction:column;
-  gap:2px;
+
+  /* hueco garantizado */
+  gap:6px;
+
   text-align:center;
   pointer-events:none;
+
+  /* un pelín de “tarjetita” para que se lea mejor */
+  padding:6px 6px 4px;
+  border-radius:12px;
+  background: rgba(0,0,0,.10);
+  border: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(6px);
+}
+
+:root[data-theme="light"] .stampInfo{
+  background: rgba(255,255,255,.60);
+  border-color: rgba(15,23,42,.10);
 }
 
 .stampDate{
   font-size:11px;
   font-weight:900;
   letter-spacing:.02em;
-  opacity:.9;
+  line-height:1.1;
+  opacity:.95;
 }
 
 .stampPhrase{
   font-size:11px;
   line-height:1.15;
   font-weight:700;
-  opacity:.82;
+  opacity:.86;
 
-  /* Máx 2 líneas, recorta el resto */
+  /* máximo 2 líneas */
   display:-webkit-box;
   -webkit-line-clamp:2;
   -webkit-box-orient:vertical;
