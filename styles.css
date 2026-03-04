@@ -221,7 +221,15 @@ h1{
   display:grid;
   grid-template-columns: repeat(5, 1fr);
   gap:12px;
-  position:relative;
+}
+
+/* móvil */
+@media (max-width: 600px){
+
+  .grid{
+    grid-template-columns: repeat(3, 1fr);
+  }
+
 }
 
 .cell{
@@ -273,7 +281,24 @@ h1{
   filter: drop-shadow(0 14px 22px rgba(0,0,0,.32));
   transform: rotate(-10deg);
 }
+@media (max-width:600px){
 
+  .markInCell svg{
+    width:55%;
+  }
+
+}
+@media (max-width:600px){
+
+  .stampPhraseTop{
+    font-size:10px;
+  }
+
+  .stampDate{
+    font-size:10px;
+  }
+
+}
 /* =============== BUTTONS =============== */
 .actions{
   display:flex;
