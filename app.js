@@ -176,11 +176,11 @@ function escapeHTML(str) {
         .replaceAll("'", "&#039;");
 }
 
-function stampMarkHTML(dateText, phraseText) {
-    const safeDate = escapeHTML(dateText);
-    const safePhrase = escapeHTML(phraseText);
+function stampMarkHTML(dateText, phraseText){
+  const safeDate = escapeHTML(dateText);
+  const safePhrase = escapeHTML(phraseText);
 
-    return `
+  return `
     <div class="markInCell" aria-hidden="true">
       <svg viewBox="0 0 200 200" fill="none">
         <defs>
@@ -196,7 +196,7 @@ function stampMarkHTML(dateText, phraseText) {
           stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
 
-      <div class="stampInfo">
+      <div class="stampMeta">
         <div class="stampDate">${safeDate}</div>
         <div class="stampPhrase">${safePhrase}</div>
       </div>
