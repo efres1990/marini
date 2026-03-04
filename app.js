@@ -34,6 +34,18 @@ const confetti = $("confetti");
 
 const logList = $("logList");
 const emptyLog = $("emptyLog");
+const messages = [
+    "Hoy es un buen día para cuidar de ti 💛",
+    "Un pequeño paso también cuenta",
+    "Respira, estás haciendo lo mejor que puedes",
+    "Cada día es una oportunidad nueva",
+    "No necesitas hacerlo perfecto",
+    "Un sello hoy ya es un logro",
+    "Eres más fuerte de lo que crees",
+    "Hoy intenta hacer algo amable contigo",
+    "Paso a paso se llega lejos",
+    "Tu esfuerzo importa"
+]
 
 function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 
@@ -331,7 +343,7 @@ let state = load();
 (async () => {
     // 1) pinta algo rápido con local (para no esperar)
     render(state);
-
+    setDailyMessage()
     // 2) intenta nube y vuelve a pintar con lo remoto
     try {
         await initCloud();
@@ -462,3 +474,19 @@ cells.forEach((c, idx) => {
         }
     });
 });
+
+function setDailyMessage() {
+
+    const el = document.getElementById("dailyMessage")
+
+    const today = new Date()
+
+    const dayNumber = Math.floor(
+        today.getTime() / (1000 * 60 * 60 * 24)
+    )
+
+    const index = dayNumber % messages.length
+
+    el.textContent = messages[index]
+
+}

@@ -561,3 +561,13 @@ textarea:focus{
 [hidden] { display: none !important; }
 .modalBack[hidden] { display: none !important; }
 .stampOverlay[hidden] { display: none !important; }
+.dailyMessage{
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:14px;
+  font-weight:600;
+  font-size:14px;
+  background: linear-gradient(135deg,#6ee7b7,#60a5fa);
+  color:white;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
