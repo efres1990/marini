@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tarjeta de Sellos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="card">
+    <header class="header">
+      <h1>Tarjeta de sellos</h1>
+      <p class="sub">Escribe tu paso de cuidado y lo sellamos 💛</p>
+    </header>
+
+    <section class="progress">
+      <div class="count">
+        <span id="count">0</span><span class="muted">/10</span>
+      </div>
+      <div class="bar" aria-label="Progreso">
+        <div id="barFill" class="bar-fill" style="width:0%"></div>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Sellos">
+      <div class="stamp" data-i="1" title="Sello 1"></div>
+      <div class="stamp" data-i="2" title="Sello 2"></div>
+      <div class="stamp" data-i="3" title="Sello 3"></div>
+      <div class="stamp" data-i="4" title="Sello 4"></div>
+      <div class="stamp" data-i="5" title="Sello 5"></div>
+      <div class="stamp" data-i="6" title="Sello 6"></div>
+      <div class="stamp" data-i="7" title="Sello 7"></div>
+      <div class="stamp" data-i="8" title="Sello 8"></div>
+      <div class="stamp" data-i="9" title="Sello 9"></div>
+      <div class="stamp" data-i="10" title="Sello 10"></div>
+    </section>
+
+    <section class="controls">
+      <button id="openModalBtn" class="primary">Añadir logro + sellar</button>
+      <button id="undoBtn">Deshacer</button>
+      <button id="resetBtn" class="danger">Reiniciar</button>
+    </section>
+
+    <section class="logbook">
+      <div class="logbook-head">
+        <h2>Lo que he conseguido</h2>
+        <button id="exportBtn" class="ghost" title="Copiar listado">Copiar</button>
+      </div>
+      <ul id="logList" class="log-list"></ul>
+      <p id="emptyLog" class="muted small">Aún no hay logros guardados.</p>
+    </section>
+
+    <section id="noteBox" class="note" hidden>
+      <h2>¡10 de 10! 🎉</h2>
+      <p>Esto merece una celebración tranquila y a tu ritmo.</p>
+      <p class="muted small">Los sellos celebran cuidado, no perfección.</p>
+    </section>
+
+    <footer class="footer">
+      <small class="muted">
+        Si en algún momento esto te presiona, se puede pausar. Lo importante es cuidarte.
+      </small>
+    </footer>
+  </main>
+
+  <!-- Modal -->
+  <div id="backdrop" class="backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">¿Qué has conseguido hoy?</h3>
+      <p class="muted small">Algo pequeño también cuenta.</p>
+
+      <textarea id="achievementInput" rows="4" placeholder="Ej: Hoy pedí ayuda / me cuidé / hice algo que me calmó..."></textarea>
+
+      <div class="modal-actions">
+        <button id="cancelBtn">Cancelar</button>
+        <button id="okBtn" class="primary">OK y sellar</button>
+      </div>
+
+      <p id="hint" class="muted small hint" hidden>Escribe algo (aunque sea una frase cortita) para poder sellar.</p>
+    </div>
+  </div>
+
+  <!-- Confetti (simple) -->
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
